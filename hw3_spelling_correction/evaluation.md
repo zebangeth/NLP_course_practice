@@ -5,7 +5,7 @@
 ### 1. Only Single-Edit Corrections
 
 - **Assumption:**
-  - The correct spelling of a misspelled word is at most **one edit distance** away, as 80% of are within edit distance of one (Daniel Jurafsky & James H. Martin, 2024). 
+  - The correct spelling of a misspelled word is at most **one edit distance** away, as 80% of errors are within edit distance of one (Daniel Jurafsky & James H. Martin, 2024). 
   - The candidate generation function produces words that are exactly one insertion, deletion, or substitution away from the input word.
 - **Limitation:**
   - Words requiring multiple edits for correction are not considered, potentially missing the correct word.
@@ -109,6 +109,8 @@
 3. **Vocabulary Limitations:**
    - Cannot suggest or confirm words not present in the vocabulary.
 
+---
+
 ## Potential Improvement
 
 **1. Extend Edit Distance**
@@ -128,7 +130,7 @@
         candidates.add(word[:i] + word[i+1] + word[i] + word[i+2:])
     ```
 
-**3. Use Weighted Error Probabilities in Candidate Generation**
+**3. Prioritize Higher Probability Corrections in Candidate Generation**
 
 - **Prioritize Likely Edits:** Use error probabilities to guide candidate generation, focusing on more probable errors.
 - **Implementation:** Instead of generating all possible edits, generate those with higher error probabilities.
