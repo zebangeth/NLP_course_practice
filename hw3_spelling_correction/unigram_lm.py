@@ -76,3 +76,33 @@ print('Deletions:', list(error_model['del'].items())[:5])
 print('Substitutions:', list(error_model['sub'].items())[:5])
 print('---')
 
+def generate_candidates(word: str) -> set:
+    """
+    Generate a set of candidate words by applying all possible single edits to the input word.
+    """
+    candidates = set([word])
+    alphabet = 'abcdefghijklmnopqrstuvwxyz'
+
+    # Insertions
+    for i in range(len(word) + 1):
+        for c in alphabet:
+            candidates.add(word[:i] + c + word[i:])
+
+    # Deletions
+    for i in range(len(word)):
+        candidates.add(word[:i] + word[i+1:])
+    
+    # Substitutions
+    for i in range(len(word)):
+        for c in alphabet:
+            candidates.add(word[:i] + c + word[i+1:])
+    
+    return candidates
+
+# Test
+print('Test generate_candidates:')
+print('Candidates for "hi":', generate_candidates('hi'), len(generate_candidates('hi')))
+print('Candidates for "world":', generate_candidates('world'), len(generate_candidates('world')))
+print('Candidates for "xxx":', generate_candidates('xxx'), len(generate_candidates('xxx')))
+print('---')
+
