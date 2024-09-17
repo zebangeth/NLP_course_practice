@@ -206,5 +206,9 @@ def correct_spelling(word: str, word_freq: dict, error_model: dict) -> str:
 print('Test correct_spelling:')
 print('Corrected "helo":', correct_spelling('helo', word_freq, error_model))
 print('Corrected "worl":', correct_spelling('worl', word_freq, error_model))
-print('Corrected "googl":', correct_spelling('googl', word_freq, error_model))
+print('Corrected "googlee":', correct_spelling('googlee', word_freq, error_model))
 print('Corrected "gogle":', correct_spelling('gogle', word_freq, error_model))
+
+print('Corrected "chekc":', correct_spelling('chekc', word_freq, error_model))
+print('Corrected "acomodate":', correct_spelling('acomodate', word_freq, error_model))
+print('Corrected "zebbang":', correct_spelling('zebbang', word_freq, error_model))
