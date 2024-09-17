@@ -106,3 +106,45 @@ print('Candidates for "world":', generate_candidates('world'), len(generate_cand
 print('Candidates for "xxx":', generate_candidates('xxx'), len(generate_candidates('xxx')))
 print('---')
 
+def calculate_error_probability(x: str, w: str, error_model: dict) -> float:
+    """
+    Calculate P(x|w), the probability of generating word x given the intended word w using the error model.
+    """
+    if x == w:
+        return 1.0
+    
+    prob = 1.0
+    for i in range(len(x)):
+        if i < len(w):
+            if x[i] != w[i]:
+                if i > 0:
+                    prob *= error_model['sub'].get((w[i], x[i]), 1e-10)
+                else:
+                    prob *= error_model['sub'].get(('#', x[i]), 1e-10)
+        else:
+            if i > 0:
+                prob *= error_model['add'].get((w[i-1], x[i]), 1e-10)
+            else:
+                prob *= error_model['add'].get(('#', x[i]), 1e-10)
+    
+    if len(w) > len(x):
+        for i in range(len(x), len(w)):
+            if i > 0:
+                prob *= error_model['del'].get((w[i-1], w[i]), 1e-10)
+            else:
+                prob *= error_model['del'].get(('#', w[i]), 1e-10)
+    
+    return prob
+
+# Test
+print('Test calculate_error_probability:')
+print('P("hi"|"hi"):', calculate_error_probability('hi', 'hi', error_model))
+print('P("hi"|"ho"):', calculate_error_probability('hi', 'ho', error_model))
+print('P("world"|"world"):', calculate_error_probability('world', 'world', error_model))
+print('P("world"|"worl"):', calculate_error_probability('world', 'worl', error_model))
+try:
+    print('P("world"|"wor"):', calculate_error_probability('world', 'wor', error_model))
+except Exception as e:
+    print('P("world"|"wor"): ', e)
+print('P("world"|"word"):', calculate_error_probability('world', 'word', error_model))
+print('---')
