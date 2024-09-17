@@ -160,7 +160,6 @@ def spell_corrector(misspelled_word):
     corrected_word = correct_word(misspelled_word)
     return corrected_word
 
-# Main program
 if __name__ == "__main__":
     while True:
         misspelled_word = input("Enter a word to correct (or 'exit' to quit): ")
