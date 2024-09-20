@@ -33,6 +33,20 @@
 - **Limitation:**
   - May not accurately reflect real-world error patterns, where certain errors are more likely in specific contexts.
 
+### 5. Extremely Low Probabilities for Deletion and Insertion Errors in the First Letter
+
+- **Assumption:**
+  - Deletion and insertion errors in the first letter of the word is extremely unlikely.
+- **Limitation:**
+  - The model may not accurately reflect the probability of errors in the first letter of a word.
+
+### 6. Higher Weight for Prior (Language Model) Over Error Probability (Channel Model)
+
+- **Assumption:**
+  - In the candidate score calculation, the language model probability `P(w)` is given more weight than the error probability `P(x|w)`.
+- **Limitation:**
+  - The model may not be as effective in correcting errors where the error probability is significantly higher than the language model probability.
+
 ---
 
 ## Scenarios Where This Spelling Corrector Works Well
