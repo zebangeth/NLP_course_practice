@@ -58,3 +58,19 @@ pi += 1
 A = A / A.sum(axis=1, keepdims=True)
 B = B / B.sum(axis=1, keepdims=True)
 pi = pi / pi.sum()
+
+test_sents = nltk.corpus.brown.tagged_sents(tagset='universal')[10150:10153]
+
+for sent in test_sents:
+    # print(sent)
+    obs = [word2idx.get(word.lower(), word2idx['UNK']) for word, _ in sent]
+    states, prob = viterbi(obs, pi, A, B)
+    
+    print("Original sentence:")
+    print(" ".join([word for word, _ in sent]))
+    print("Actual POS sequence:")
+    print(" ".join([tag for _, tag in sent]))
+    print("Predicted POS sequence:")
+    print(" ".join([idx2tag[state] for state in states]))
+    print("Probability of predicted sequence:", prob)
+    print()
