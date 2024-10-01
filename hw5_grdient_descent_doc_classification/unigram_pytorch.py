@@ -45,13 +45,10 @@ class Unigram(nn.Module):
         # compute log probability of input
         return torch.sum(input, 1, keepdim=True).T @ logp
 
-
-
 def generate_optimal_text(token_probs, length):
     """Generate text based on optimal unigram probabilities."""
     tokens, probs = zip(*token_probs.items())
     return [random.choices(tokens, weights=probs)[0] for _ in range(length)]
-
 
 def gradient_descent_example():
     """Demonstrate gradient descent."""
@@ -76,8 +73,8 @@ def gradient_descent_example():
     model = Unigram(len(vocabulary))
 
     # set number of iterations and learning rate
-    num_iterations = 50 # SET THIS
-    learning_rate = 0.1  # SET THIS
+    num_iterations = 100
+    learning_rate = 0.1
 
     # train model
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -91,41 +88,20 @@ def gradient_descent_example():
         optimizer.zero_grad()
         losses.append(loss.item())
 
-    # # Compute optimal probabilities
-    # token_counts = Counter(tokens)
-    # total_tokens = len(tokens)
-    # optimal_probs = torch.tensor([token_counts.get(token, 0) / total_tokens for token in vocabulary])
-    
-    # # Compute minimum possible loss using LogSoftmax
-    # optimal_log_probs = F.log_softmax(optimal_probs, dim=0)
-    # min_loss = -torch.sum(optimal_probs * optimal_log_probs)
-
-
     # Compute optimal probabilities
     token_counts = Counter(tokens)
     total_tokens = len(tokens)
     optimal_probs = {token: count / total_tokens for token, count in token_counts.items()}
 
-
-    # Generate text using optimal unigram model
+    # Generate the "optimal" text using optimal unigram model
     optimal_text = generate_optimal_text(optimal_probs, total_tokens)
     optimal_encodings = np.hstack([onehot(vocabulary, token) for token in optimal_text])
     optimal_x = torch.tensor(optimal_encodings.astype(float))
 
-    # Compute minimum possible loss
+    # Compute the loss for the "optimal" text as the minimum possible loss
     with torch.no_grad():
         optimal_logp = model(optimal_x)
         min_loss = loss_fn(optimal_logp).item()
-
-
-    # # Compute optimal probabilities
-    # token_counts = Counter(tokens)
-    # total_tokens = len(tokens)
-    # optimal_probs = {token: count / total_tokens for token, count in token_counts.items()}
-    # # optimal_probs[None] = 0  # Assume no unknown tokens in optimal case
-
-    # # Compute minimum possible loss
-    # min_loss = -sum(count * np.log(optimal_probs[token]) for token, count in token_counts.items())
 
     # Visualize final token probabilities
     learned_probs = torch.nn.Softmax(0)(model.s).detach().numpy().flatten()
