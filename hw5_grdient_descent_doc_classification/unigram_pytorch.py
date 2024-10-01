@@ -55,15 +55,24 @@ def calculate_min_loss(model: nn.Module, optimal_x: torch.Tensor) -> float:
 
 def visualize_token_probabilities(vocabulary: List[str], learned_probs: np.ndarray, optimal_probs: Dict[str, float]):
     """Visualize learned vs optimal token probabilities."""
-    plt.figure(figsize=(12, 6))
-    plt.bar(range(len(vocabulary)), learned_probs, alpha=0.5, label='Learned')
-    plt.bar(range(len(vocabulary)), [optimal_probs.get(token, 0) for token in vocabulary], 
-            alpha=0.5, label='Optimal')
-    plt.xticks(range(len(vocabulary)), vocabulary, rotation='vertical')
-    plt.xlabel('Tokens')
-    plt.ylabel('Probability')
-    plt.title('Learned vs Optimal Token Probabilities')
-    plt.legend()
+    fig, ax = plt.subplots(figsize=(15, 8))
+    
+    x = np.arange(len(vocabulary))
+    width = 0.35
+    
+    ax.bar(x - width/2, learned_probs, width, label='Learned', alpha=0.8)
+    ax.bar(x + width/2, [optimal_probs.get(token, 0) for token in vocabulary], width, label='Optimal', alpha=0.8)
+
+    ax.set_xlabel('Tokens')
+    ax.set_ylabel('Probability')
+    ax.set_title('Learned vs Optimal Token Probabilities')
+    ax.set_xticks(x)
+    
+    display_vocab = [token if token not in [" ", None] else ("SPACE" if token == " " else "UNK") for token in vocabulary]
+    ax.set_xticklabels(display_vocab, rotation='vertical')
+    
+    ax.legend()
+
     plt.tight_layout()
     plt.savefig('token_probabilities.png')
 
