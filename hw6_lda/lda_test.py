@@ -7,6 +7,7 @@ from typing import List
 from gensim.corpora.dictionary import Dictionary
 from gensim.models import LdaModel
 import numpy as np
+from scipy.optimize import linear_sum_assignment
 
 
 def lda_gen(vocabulary: List[str], alpha: np.ndarray, beta: np.ndarray, xi: int) -> List[str]:
@@ -77,6 +78,32 @@ def test():
         words_with_prob = sorted(list(zip(vocabulary, topic)), key=lambda x: x[1], reverse=True)
         for word, prob in words_with_prob:
             print(f"{word}: {prob}")
+
+    # Reorders the columns of the beta matrix to match the order of the original vocabulary
+    inferred_beta = model.get_topics()  # shape (num_topics, vocab_size)
+    vocab_word_ids = [dictionary.token2id[word] for word in vocabulary]
+    inferred_beta_reordered = inferred_beta[:, vocab_word_ids]
+
+    # Compute cosine similarity between each pair of inferred and true topics
+    num_topics = beta.shape[0]
+    similarity_matrix = np.zeros((num_topics, num_topics))
+    for i in range(num_topics):
+        for j in range(num_topics):
+            inferred_topic = inferred_beta_reordered[i]
+            true_topic = beta[j]
+            # Compute cosine similarity
+            cosine_sim = np.dot(inferred_topic, true_topic) / (np.linalg.norm(inferred_topic) * np.linalg.norm(true_topic))
+            similarity_matrix[i, j] = cosine_sim
+
+    # print("\nSimilarity Matrix (rows: inferred topics, columns: true topics):")
+    # print(similarity_matrix)
+
+    # Find the best matching between inferred and true topics
+    row_ind, col_ind = linear_sum_assignment(-similarity_matrix)
+
+    print("\nTopic Mapping:")
+    for inferred_i, true_j in zip(row_ind, col_ind):
+        print(f"Inferred Topic {inferred_i} maps to True Topic {chr(ord('A') + true_j)} with similarity {similarity_matrix[inferred_i, true_j]:.4f}")
 
 if __name__ == "__main__":
     test()
