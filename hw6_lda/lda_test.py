@@ -62,13 +62,21 @@ def test():
     # Show the inferred alpha (topic distribution per document)
     print("Inferred alpha: ", model.alpha)
 
-    # Show the inferred beta (word distribution per topic)
+    # Show the inferred beta vectors (word distribution per topic)
     for idx, topic in model.show_topics(formatted=False):
         print("----------------")
         print(f"Inferred Topic {idx}:")
         for word, prob in topic:
             print(f"{word}: {prob}")
 
+    # Print true topics for comparison
+    print("\nTrue Topics:")
+    for i, topic in enumerate(beta):
+        print("----------------")
+        print(f"True Topic {chr(ord('A') + i)}:")
+        words_with_prob = sorted(list(zip(vocabulary, topic)), key=lambda x: x[1], reverse=True)
+        for word, prob in words_with_prob:
+            print(f"{word}: {prob}")
 
 if __name__ == "__main__":
     test()
