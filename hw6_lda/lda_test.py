@@ -10,7 +10,26 @@ import numpy as np
 
 
 def lda_gen(vocabulary: List[str], alpha: np.ndarray, beta: np.ndarray, xi: int) -> List[str]:
-    ...
+    """Generate a document using the LDA model."""
+    
+    # document length
+    doc_len = np.random.poisson(xi)
+
+    # topic distribution
+    theta = np.random.dirichlet(alpha)
+
+    # number of topics
+    num_topics = beta.shape[0]
+
+    words = []
+    for _ in range(doc_len):
+        # sample a topic: topic from theta
+        topic = np.random.choice(num_topics, p=theta)
+
+        # sample a word from the topic: word from beta[topic]
+        word_idx = np.random.choice(len(vocabulary), p=beta[topic])
+        words.append(vocabulary[word_idx])
+
     return words
 
 
@@ -39,7 +58,10 @@ def test():
         id2word=dictionary,
         num_topics=3,
     )
+
+    # Show the inferred alpha (topic distribution per document)
     print(model.alpha)
+    # Show the inferred beta (word distribution per topic)
     print(model.show_topics())
 
 
