@@ -60,9 +60,14 @@ def test():
     )
 
     # Show the inferred alpha (topic distribution per document)
-    print(model.alpha)
+    print("Inferred alpha: ", model.alpha)
+
     # Show the inferred beta (word distribution per topic)
-    print(model.show_topics())
+    for idx, topic in model.show_topics(formatted=False):
+        print("----------------")
+        print(f"Inferred Topic {idx}:")
+        for word, prob in topic:
+            print(f"{word}: {prob}")
 
 
 if __name__ == "__main__":
