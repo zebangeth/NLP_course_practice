@@ -48,7 +48,7 @@ def test():
     xi = 50
     documents = [
         lda_gen(vocabulary, alpha, beta, xi)
-        for _ in range(100)
+        for _ in range(1000)
     ]
 
     # Create a corpus from a list of texts
