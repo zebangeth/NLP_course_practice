@@ -1,5 +1,6 @@
 ## HW8. Seq2Seq
 
+**Size of Input, Hidden State, and Output Vectors**
 | Component          | Description                                      | Size      |
 |--------------------|--------------------------------------------------|-----------|
 | **Input Vector**   | One-hot encoding of tokens `"a"`, `"b"`, etc.    | **6**     |
