@@ -1,5 +1,11 @@
 ## HW8. Seq2Seq
 
+| Component          | Description                                      | Size      |
+|--------------------|--------------------------------------------------|-----------|
+| **Input Vector**   | One-hot encoding of tokens `"a"`, `"b"`, etc.    | **6**     |
+| **Hidden State**   | Counts of tokens `"a"` to `"e"`                  | **5**     |
+| **Output Vector**  | Count and end-of-sequence indicator              | **2**     |
+
 **Final Weights**
 
 **1. Encoding Weight Matrix $ W_e $ (size $ 5 \times 11 $)**
