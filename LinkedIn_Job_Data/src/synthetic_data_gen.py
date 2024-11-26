@@ -244,5 +244,5 @@ class SyntheticJobDataGenerator:
 
 
 generator = SyntheticJobDataGenerator()
-data = generator.generate_dataset(1000)
+data = generator.generate_dataset(10000)
 data.to_csv('./synthetic_job_data.csv', index=False)
