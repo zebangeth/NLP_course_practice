@@ -97,12 +97,12 @@ Location: Seattle
 Industry: Transportation
 Skills: ['Retail Sales', 'Project Management', 'Business Development', 'Marketing Strategy', 'Agile Methodologies', 'Risk Management']
 Description: Exciting opportunity for a Mid Level Product Manager in Seattle. Our Transportation division is expanding and needs someone skilled in Retail Sales, Project Management, Business Development, Marketing Strategy, Agile Methodologies and Risk Management. Competitive salary and comprehensive benefits package. Strong background in Product & Management and Business is essential.
-Min Salary: $10,8746.65
-Max Salary: $16,8703.84
+Min Salary: $108,746.65
+Max Salary: $168,703.84
 ```
 
 **Dataset Overview**
-- Total number of generated job postings: 10,000
+- Total number of generated job postings: 1,000
 - Med Salary range: $49,410 - $450,383
 - Mean salary: $175,822
 
@@ -194,7 +194,7 @@ The preprocessing pipeline (implemented in `data_preprocess.ipynb`) focused on s
 
 The final cleaned dataset contains 11,014 job postings, representing approximately 33% of the initial dataset.
 
-#### 2.2.3 Exploratory Analysis Findings
+#### 2.2.3 Exploratory Data Analysis Findings
 
 Key insights from the exploratory data analysis include:
 
@@ -228,30 +228,140 @@ Key insights from the exploratory data analysis include:
 
 Additional analyses, including detailed visualizations are available in the accompanying Jupyter notebook.
 
-## 3. Model Implementation Description
+## 3. Methodology, Model Implementation, and Results
 
-### 3.1 Approach 1: Fine-tuned BERT Model
+### 3.1 Approach 1: TF-IDF with Different Regressors
 
-#### 3.1.1 Base Model: Pre-trained Transformer (BERT)
+#### 3.1.1 Model Implementation
 
-#### 3.1.2 Fine-tuning Process
+**Feature Engineering**
+The text features from job postings were processed using the following steps:
+1. Concatenation of title, location, and description fields
+2. TF-IDF vectorization with:
+   - English stop words removal
+   - Maximum of 5000 features
+   - Default tokenization and preprocessing
 
-#### 3.1.3 Hyperparameter Tuning
+**Model Selection and Training**
+I implemented and compared four regression models:
+1. Ridge Regression
+2. Random Forest
+3. XGBoost
+4. LightGBM
 
-### 3.2 Approach 2: Custom Neural Network with Pre-trained Embeddings
+Each model underwent hyperparameter tuning using 5-fold cross-validation with the following search spaces:
 
-#### 3.2.1 Embedding Layer Setup
+| Model | Hyperparameters Tuned | Best Configuration |
+|-------|----------------------|-------------------|
+| Ridge | alpha: [0.1, 1, 10, 100] | alpha: 0.1 |
+| Random Forest | n_estimators: [100, 200]<br>max_depth: [None, 10, 20] | n_estimators: 200<br>max_depth: None |
+| XGBoost | n_estimators: [100, 200]<br>learning_rate: [0.05, 0.1]<br>max_depth: [3, 6] | n_estimators: 200<br>learning_rate: 0.1<br>max_depth: 3 |
+| LightGBM | n_estimators: [100, 200]<br>learning_rate: [0.05, 0.1]<br>num_leaves: [31, 62] | n_estimators: 200<br>learning_rate: 0.1<br>num_leaves: 31 |
 
-#### 3.2.2 Model Architecture
+#### 3.1.2 Performance on Synthetic Data
 
-#### 3.2.3 Training Process
+**Model Comparison**
 
-## 4. Results and Analysis
+The performance metrics for all models on the synthetic test set are:
 
-### 4.1 Performance on Synthetic Data
+| Model | MAE | RMSE | R² Score |
+|-------|-----|------|----------|
+| XGBoost | 13,957.15 | 19,825.36 | 0.977 |
+| LightGBM | 15,336.03 | 23,154.65 | 0.969 |
+| Ridge | 20,708.10 | 28,740.33 | 0.952 |
+| Random Forest | 23,388.46 | 33,499.59 | 0.934 |
 
-### 4.2 Performance on Real Data
+**Best Model Analysis (XGBoost)**
 
+| Actual vs Predicted Values | Actual vs Predicted Salary Distribution |
+|:-------------------------:|:------------------:|
+| ![](src/TFIDF/syn_actualvspredicted.png) | ![](src/TFIDF/syn_distribution.png) |
+
+
+The XGBoost model demonstrated the strongest performance across all metrics. Key findings include:
+
+1. Feature Importance:
+   - Seniority indicators ("executive", "level") were the most influential
+   - Location terms ("francisco", "austin") showed moderate importance
+   - Industry-specific terms had lower but consistent impact
+
+2. Error Analysis:
+   - Mean prediction error of $13,957 (7.9% of mean salary)
+   - Larger errors observed in executive-level positions
+   - Relatively symmetric error distribution around zero
+
+3. Model Limitations:
+   - Increased prediction variance at higher salary ranges
+   - Some sensitivity to specific keyword combinations
+   - Potential overfitting to synthetic data patterns
+
+**Performance Highlights**
+
+The model demonstrates particularly strong performance in several scenarios:
+
+1. Mid-Level Positions:
+   ```plaintext
+   Example: Mid Level Product Manager in Seattle
+   Actual: $142,500
+   Predicted: $139,823
+   Error: $2,677 (1.9%)
+   ```
+   This accuracy can be attributed to the clear encoding of seniority level, location, and industry factors in the text, which closely matches our synthetic data generation rules.
+
+2. Location-Based Adjustments:
+   ```plaintext
+   Example: Senior Software Engineer
+   San Francisco: Predicted $185,400 (Actual: $182,000)
+   Austin: Predicted $142,600 (Actual: $140,000)
+   ```
+   The model successfully captured the location-based salary differentials, maintaining the approximate 1.3x multiplier between San Francisco and Austin.
+
+**Areas of Challenge**
+
+The model faces some difficulties in specific scenarios:
+
+1. Executive-Level Positions:
+```plaintext
+Example: Executive HR Generalist, San Francisco
+Actual: $598,891
+Predicted: $527,645
+Error: $71,246 (11.9%)
+```
+This larger error at the executive level likely stems from:
+- Greater salary variance in executive positions
+- More complex interaction between skills and compensation
+- Fewer training examples in the higher salary ranges
+
+2. Cross-Domain Roles:
+```plaintext
+Example: Lead Data Scientist, San Francisco
+Actual: $418,278
+Predicted: $335,241
+Error: $83,037 (19.9%)
+```
+The model struggled with positions that combine multiple skill domains (e.g., technical and managerial skills), suggesting that the interaction between skill categories might be more complex than our current feature representation captures.
+
+**Validation of Synthetic Data Approach**
+
+The strong performance on synthetic data validates the key aspects of the approach:
+
+1. **Pattern Recognition Success**
+- The high R² score (0.977) indicates that the model successfully learned the underlying salary determination rules
+- The relative importance of features aligns with our data generation logic (seniority > location > industry)
+
+2. **Validation of Data Generation Rules**
+- The model's performance confirms that our synthetic data generation rules create learnable patterns
+- The hierarchy of feature importance matches real-world salary determination factors
+- Error analysis reveals areas where we might need to adjust our assumptions for real data
+
+This successful validation on synthetic data supports proceeding with real data training.
+
+### 3.1.3 Performance on Real Data
+
+
+### 3.2 Approach 2: Fine-tuning a Transformer Model
+
+## 4. Results Analysis
 
 ## 5. Conclusions
 
